@@ -20,7 +20,7 @@ export default function Timer({ artwork: { endsAt, createdAt } }: Props) {
 		}, 1000);
 
 		return () => clearInterval(timer);
-	}, []);
+	}, [endsAt, setTimeLeft]);
 
 	return (
 		<>

@@ -16,7 +16,6 @@ export default function Notifications() {
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 
-	if (!userId) return null;
 
 	useEffect(() => {
 		async function getNotifications() {
@@ -28,9 +27,10 @@ export default function Notifications() {
 			setNotifications(notifications.notifications);
 			setIsLoading(false);
 		}
-		getNotifications();
-	}, []);
+		userId && getNotifications();
+	}, [userId]);
 
+	if (!userId) return null;
 	const readNotification = async (notification: Notification) => {
 		try {
 			const res = await fetch(`/api/notifications/${userId}`, {

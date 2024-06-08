@@ -22,16 +22,22 @@ import {
 import { CalendarIcon, CloudUpload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/use-toast';
+import { addArtwork } from '@/lib/actions';
+import { Metadata } from 'next';
+import { useRouter } from 'next/navigation';
 
 const allowedTypes = ['image/jpeg', 'image/png'];
 const maxFileSizeBytes = 4 * 1024 * 1024; // 4mb
 
 export default function CreateAuction() {
+	const router = useRouter();
+
 	const [selectedImage, setSelectedImage] = useState<File | null>(null);
+	const [isPending, startTransition] = useTransition();
 	const onDrop = useCallback(async (acceptedFiles: File[]) => {
 		if (acceptedFiles.length > 0) {
 			const image = acceptedFiles[0];
@@ -44,7 +50,7 @@ export default function CreateAuction() {
 		resolver: zodResolver(artworkSchema),
 		defaultValues: {
 			name: '',
-			startValue: 0,
+			startValue: '' as unknown as number,
 		},
 	});
 	const { toast } = useToast();
@@ -79,15 +85,38 @@ export default function CreateAuction() {
 				variant: 'destructive',
 			});
 		}
-		console.log(values);
+		const artworkData = new FormData();
+		artworkData.append('name', values.name);
+		artworkData.append('startValue', values.startValue.toString());
+		artworkData.append('image', selectedImage);
+		artworkData.append('endsAt', format(new Date(values.endsAt), 'yyyy-MM-dd'));
+
+		startTransition(() => {
+			addArtwork(artworkData).then(res => {
+				if (res?.error) {
+					return toast({
+						title: res.error,
+						variant: 'destructive',
+					});
+				}
+				if (res?.success) {
+					toast({
+						title: res?.success,
+						variant: 'success',
+					});
+					form.reset();
+					router.push('/auctions/' + res.id);
+				}
+			});
+		});
 	}
 	return (
-		<div className='my-2'>
+		<div className='mt-2 mb-4'>
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
-					className='grid grid-cols-2 gap-4'>
-					<div {...getRootProps()} className='h-full'>
+					className='grid grid-cols-2 gap-8'>
+					<div {...getRootProps()} className='h-full col-span-2 md:col-span-1'>
 						<label
 							htmlFor='dropzone-file'
 							className='relative flex flex-col items-center justify-center p-6 border-2 border-gray-300/50 border-dashed rounded-lg cursor-pointer w-full visually-hidden-focusable min-h-96'>
@@ -129,25 +158,30 @@ export default function CreateAuction() {
 							accept='image/png, image/jpeg'
 							type='file'
 							className='hidden'
+							disabled={isPending}
 							// disabled={loading || uploadedImagePath !== null}
 							onChange={handleImageChange}
 						/>
 					</div>
-					<div className='my-auto'>
+					<div className='my-auto col-span-2 md:col-span-1'>
 						<FormField
 							control={form.control}
 							name='name'
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className=''>
+									<FormLabel className='font-matrice-semibold'>Name</FormLabel>
 									<FormControl>
 										<Input
-											className='bg-white/20 px-4 rounded-3xl my-4'
-											placeholder='Enter artwork name'
-											title='Artwork name'
+											className='bg-white/20'
+											title='Name of the artwork'
+											disabled={isPending}
+											required
+											placeholder='Name of the artwork'
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage className='text-red-600 mx-4' />
+
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -155,13 +189,17 @@ export default function CreateAuction() {
 							control={form.control}
 							name='startValue'
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className='mt-4'>
+									<FormLabel className='font-matrice-semibold'>
+										Start bid
+									</FormLabel>
 									<FormControl>
 										<Input
-											className='bg-white/20 px-4 rounded-3xl my-4'
+											className='bg-white/20'
 											placeholder='Starting bit at'
 											title='Starting bit at'
 											type='number'
+											disabled={isPending}
 											{...field}
 											onChange={event =>
 												field.onChange(Number(event.target.value))
@@ -177,15 +215,19 @@ export default function CreateAuction() {
 							control={form.control}
 							name='endsAt'
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className='mt-4'>
+									<FormLabel className='font-matrice-semibold'>
+										Big end date
+									</FormLabel>
 									<Popover>
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
 													title='Big ends at'
+													disabled={isPending}
 													variant={'outline'}
 													className={cn(
-														'w-full text-left font-normal bg-white/20 px-4 rounded-3xl',
+														'w-full text-left font-normal bg-white/20',
 														!field.value && 'text-muted-foreground'
 													)}>
 													{field.value ? (
@@ -198,7 +240,7 @@ export default function CreateAuction() {
 											</FormControl>
 										</PopoverTrigger>
 										<PopoverContent
-											className='w-auto p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-0'
+											className='w-auto p-0 bg-background/95 backdrop-blur-3xl supports-[backdrop-filter]:bg-background/60 border-0'
 											align='start'>
 											<Calendar
 												mode='single'
@@ -214,7 +256,8 @@ export default function CreateAuction() {
 							)}
 						/>
 						<Button
-							className='bg-blue-600 font-normal text-foreground hover:bg-blue-700 rounded-3xl w-full my-4'
+							disabled={isPending}
+							className='bg-blue-600 font-normal text-foreground hover:bg-blue-700 w-full mt-8'
 							type='submit'>
 							Submit
 						</Button>

@@ -16,6 +16,7 @@ export default function AuctionNav({ links,type }: Props) {
 			<div className='font-matrice text-3xl space-x-8 my-4'>
 				{links?.map(link => (
 					<Link
+						key={link.title}
 						href={link.type ? `?type=${link.type}` : type==='all'?'/auctions':'/auctions/my'}
 						className={cn(
 							'transition-colors hover:text-foreground/80',

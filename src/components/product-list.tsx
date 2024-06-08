@@ -1,21 +1,18 @@
+import { Artwork } from '../../typings';
 import ProductCard from './product-card';
 
-type Props = {};
-export default function ProductList({}: Props) {
+type Props = { artworks: Artwork[]; ended?: boolean };
+export default function ProductList({ artworks, ended }: Props) {
 	return (
-		<div className='grid grid-cols-3 gap-3 grid-rows-8'>
-			<ProductCard full />
-			<ProductCard ended/>
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard full />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
-			<ProductCard />
+		<div className='grid grid-cols-3 gap-3 grid-rows-3 grid-flow-dense mb-16'>
+			{artworks.map((artwork, i) => (
+				<ProductCard
+					key={artwork.id}
+					artwork={artwork}
+					full={i % 7 === 0}
+					ended={ended}
+				/>
+			))}
 		</div>
 	);
 }

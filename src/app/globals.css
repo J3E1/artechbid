@@ -49,6 +49,18 @@
 		font-weight: 400;
 		font-style: normal;
 	}
+	@font-face {
+		font-family: Helvetica;
+		src: url('/fonts/Helvetica 93 Black Extended.ttf');
+		font-weight: 400;
+		font-style: normal;
+	}
+	@font-face {
+		font-family: Helvetica-Semibold;
+		src: url('/fonts/Helvetica 93 Black Extended.ttf');
+		font-weight: 200;
+		font-style: normal;
+	}
 	input[type='number']::-webkit-inner-spin-button,
 	input[type='number']::-webkit-outer-spin-button {
 		-webkit-appearance: none;

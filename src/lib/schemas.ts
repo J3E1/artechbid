@@ -20,3 +20,25 @@ export const artworkSchema = z.object({
 });
 
 export type ArtWorkSchema = z.infer<typeof artworkSchema>;
+
+export const loginSchema = z.object({
+	username: z
+		.string({ required_error: 'Please enter your email.' }),
+	password: z
+		.string({ required_error: 'Please enter your password.' })
+		.min(6, 'Password should be at-least 6 characters long.'),
+});
+export type LoginSchema = z.infer<typeof loginSchema>;
+
+export const registerSchema = z.object({
+	username: z
+		.string({ required_error: 'Please enter your username.' })
+		.min(3, 'Username should be at-least 3 characters long.'),
+	email: z
+		.string({ required_error: 'Please enter your email.' })
+		.email({ message: 'Please enter a valid email.' }),
+	password: z
+		.string({ required_error: 'Please enter your password.' })
+		.min(6, 'Password should be at-least 6 characters long.'),
+});
+export type RegisterSchema = z.infer<typeof registerSchema>;

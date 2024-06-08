@@ -1,11 +1,13 @@
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Artwork } from '../../typings';
 
 type Props = {
+	artwork: Artwork;
 	full?: boolean;
 	ended?: boolean;
 };
-export default function ProductCard({ full, ended }: Props) {
+export default function ProductCard({ full, ended, artwork }: Props) {
 	return (
 		<>
 			<div
@@ -18,9 +20,9 @@ export default function ProductCard({ full, ended }: Props) {
 				<div className='h-full'>
 					<div className='relative space-y-4 flex flex-col justify-between h-full'>
 						<div className='flex-1 flex justify-center items-center'>
-							<Link href='/auctions/1'>
+							<Link href={'/auctions/' + artwork.id}>
 								<img
-									src='https://img.freepik.com/free-vector/watercolor-oil-painting-background_23-2150133488.jpg?w=740&t=st=1716484985~exp=1716485585~hmac=28bd9d6909990af8a2350ab8da735119826514e51675225533b100815f03d0b6'
+									src={artwork.imageUrl}
 									className={cn(
 										'cursor-pointer shadow-2xl shadow-background object-contain',
 										full ? 'max-w-[26rem]' : 'max-w-[13rem]'
@@ -30,8 +32,12 @@ export default function ProductCard({ full, ended }: Props) {
 						</div>
 						<div className='flex justify-between items-end text-sm'>
 							<div>
-								<h6 className='font-matrice text-md'>Neo Topical</h6>
-								<h6 className='text-foreground/80 font-light'>@testliciana</h6>
+								<h6 className='font-matrice text-md'>{artwork.name}</h6>
+								{artwork?.username ? (
+									<h6 className='text-foreground/80 font-light'>
+										@{artwork.username}
+									</h6>
+								) : null}
 							</div>
 							<div>
 								{ended ? (
@@ -40,7 +46,10 @@ export default function ProductCard({ full, ended }: Props) {
 									</span>
 								) : (
 									<span className='text-foreground/80 font-light'>
-										2,000 $ / 15:00:00
+										${artwork.highestBid} |{' '}
+										{new Date(
+											artwork.endsAt?.seconds * 1000
+										).toLocaleDateString('en-GB', { timeZone: 'UTC' })}
 									</span>
 								)}
 							</div>

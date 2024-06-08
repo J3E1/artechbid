@@ -89,6 +89,8 @@ const config = {
 			},
 			fontFamily: {
 				matrice: 'Matrice',
+				helvetica: 'Helvetica',
+				"helvetica-semibold": 'Helvetica-Semibold',
 				'matrice-semibold': 'Matrice-Semibold',
 			},
 		},

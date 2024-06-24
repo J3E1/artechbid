@@ -31,7 +31,7 @@ Follow these steps to set up the project locally.
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/your-username/art-auction-platform.git
+   git clone https://github.com/J3E1/artechbid.git
    cd art-auction-platform
    ```
 

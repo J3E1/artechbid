@@ -13,7 +13,7 @@ export default function AuctionNav({ links,type }: Props) {
 
 	return (
 		<div className='my-8 border-b border-foreground/60 flex justify-center'>
-			<div className='font-matrice text-3xl space-x-8 my-4'>
+			<div className='font-matrice text-2xl lg:text-3xl space-x-8 my-4'>
 				{links?.map(link => (
 					<Link
 						key={link.title}

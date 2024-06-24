@@ -4,7 +4,7 @@ import ProductCard from './product-card';
 type Props = { artworks: Artwork[]; ended?: boolean };
 export default function ProductList({ artworks, ended }: Props) {
 	return (
-		<div className='grid grid-cols-3 gap-3 grid-rows-3 grid-flow-dense mb-16'>
+		<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 grid-rows-3 grid-flow-dense mb-16'>
 			{artworks.map((artwork, i) => (
 				<ProductCard
 					key={artwork.id}

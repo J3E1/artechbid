@@ -42,7 +42,7 @@ export default async function MyAuctions({
 		<>
 			<AuctionNav links={links} type='my' />
 			{artworks.length ? (
-				<div className='grid grid-cols-3 gap-3 grid-rows-6'>
+				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 grid-rows-6'>
 					{artworks.map((artwork, i) => (
 						<ProductCard
 							key={artwork.id}

@@ -1,141 +1,158 @@
-# 🎨 artechbid
+# artechbid
 
-Welcome to the artechbid! This project is a web application where users can create, view, and bid on artwork. It supports bidding and notifications to keep you updated with the latest bids. 🖌️
+<p align="center">
+  A full-stack digital art auction experience built with Next.js and Firebase.
+</p>
 
-## 🌟 Features
+<p align="center">
+  <img alt="Next.js 14" src="https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white">
+  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-10-FFCA28?logo=firebase&logoColor=black">
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-green.svg"></a>
+</p>
 
-- 🖼️ **Artwork Creation:** Users can create and upload their own artwork.
-- 💸 **Real-Time Bidding:** Bid on artwork created by others.
-- 📢 **Notifications:** Receive notifications if someone outbids you.
-- ⏳ **Auction Timer:** Countdown timer for live auctions.
-- 📜 **User Profiles:** Track your bids and created artworks.
+artechbid lets people publish artwork as timed auctions, discover live and
+completed listings, place bids, and follow auction activity from one responsive
+interface.
 
-## 🛠️ Tech Stack
+## Highlights
 
-- **Frontend:** NextJS, ReactJS, Tailwind CSS, ShadCN
-- **Backend:** Firebase (Firestore, Firebase Storage, Cloud Functions)
-- **Authentication:** NextAuth
-- **Notification System:** Firestore triggers and collections
+- Create timed auctions with JPEG or PNG artwork uploads.
+- Browse all, live, and ended auctions from filterable views.
+- Place progressively higher bids with transactional Firestore writes.
+- Prevent creators from bidding on their own artwork.
+- Notify the previous bidder when they have been outbid.
+- Track your own live and completed artwork listings.
+- Sign up and sign in with credential-based authentication.
 
-## 🚀 Getting Started
+## How it works
 
-Follow these steps to set up the project locally.
+```mermaid
+flowchart LR
+    U[Browser] --> N[Next.js App Router]
+    N --> A[NextAuth]
+    N --> R[API routes and server actions]
+    R --> F[(Cloud Firestore)]
+    R --> S[(Firebase Storage)]
+    F --> N
+```
+
+The App Router renders the auction catalogue and detail pages. NextAuth handles
+credential sessions, while server actions and API routes coordinate artwork
+uploads, bids, and notifications with Firebase.
+
+## Tech stack
+
+| Area | Tools |
+| --- | --- |
+| Application | Next.js 14, React 18, TypeScript |
+| Interface | Tailwind CSS, shadcn/ui, Radix UI, Lucide |
+| Forms | React Hook Form, Zod |
+| Data and files | Cloud Firestore, Firebase Storage |
+| Authentication | NextAuth v5 credentials provider, bcrypt |
+| Deployment | Vercel |
+
+## Getting started
 
 ### Prerequisites
 
-- Node.js (v20+)
-- Yarn or npm or pnpm
+- Node.js 20 or newer
+- [pnpm](https://pnpm.io/) 9 or newer
+- A Firebase project with Firestore and Storage enabled
 
-### Installation
+### Local setup
 
-1. **Clone the Repository:**
+1. Clone the repository.
 
    ```bash
    git clone https://github.com/J3E1/artechbid.git
-   cd art-auction-platform
+   cd artechbid
    ```
 
-2. **Install Dependencies:**
+2. Install the locked dependencies.
 
    ```bash
-   yarn install
+   pnpm install --frozen-lockfile
    ```
 
-   or
+3. Create your local environment file.
 
    ```bash
-   npm install
+   cp .env.example .env.local
    ```
-   or
+
+4. Add the Firebase web app configuration from the
+   [Firebase console](https://console.firebase.google.com/) and generate an
+   authentication secret.
 
    ```bash
-   pnpm install
+   openssl rand -base64 32
    ```
 
-3. **Set Up Firebase:**
+   Paste that output into `AUTH_SECRET` in `.env.local`.
 
-   - Create a new project in the [Firebase Console](https://console.firebase.google.com/).
-   - Add a new web app to your Firebase project.
-   - Copy the Firebase config object and paste it into a new file named `firebaseConfig.js` in the `src` directory:
-
-     ```javascript
-     // src/firebaseConfig.js
-     const firebaseConfig = {
-       apiKey: "YOUR_API_KEY",
-       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-       projectId: "YOUR_PROJECT_ID",
-       storageBucket: "YOUR_PROJECT_ID.appspot.com",
-       messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-       appId: "YOUR_APP_ID",
-       measurementId: "YOUR_MEASUREMENT_ID"
-     };
-
-     export default firebaseConfig;
-     ```
-
-4. **Configure Firestore Rules:**
-
-   Go to the Firebase Console and navigate to Firestore Database > Rules. Set your rules to:
-
-   ```plaintext
-   rules_version = '2';
-   service cloud.firestore {
-     match /databases/{database}/documents {
-       match /users/{userId} {
-         allow read, write: if true;
-         match /notifications/{notificationId} {
-           allow read, write: true;
-         }
-       }
-       match /artworks/{artworkId} {
-         allow read, write: true;
-         match /bids/{bidId} {
-           allow read, write: true;
-         }
-       }
-     }
-   }
-   ```
-
-5. **Start the Development Server:**
+5. Start the development server.
 
    ```bash
-   yarn dev
+   pnpm dev
    ```
 
-   or
+6. Open [http://localhost:3000](http://localhost:3000).
 
-   ```bash
-   npm run dev
-   ```
-   or
+> [!IMPORTANT]
+> Configure Firestore and Storage rules for your own threat model before using
+> the app with production data. Do not use blanket public read/write rules in a
+> production Firebase project.
 
-   ```bash
-   npm dev
-   ```
+## Project structure
 
-   Open [http://localhost:3000](http://localhost:3000) to view the app in the browser.
+```text
+src/
+├── app/
+│   ├── (auth)/          # Sign-in and registration pages
+│   ├── api/             # Auction, authentication, and notification routes
+│   └── auctions/        # Catalogue, creation, detail, and personal views
+├── components/          # Auction and shared UI components
+└── lib/
+    ├── actions.ts       # Authentication and auction server actions
+    ├── firebase.ts      # Firebase clients and collection references
+    ├── schemas.ts       # Zod validation schemas
+    └── utils.ts         # Auction queries, bidding, and notifications
+```
 
-## 📚 Usage
+## Available commands
 
-- **Create an Account:** Sign up and create your user profile.
-- **Add Artwork:** Navigate to the 'create' section to upload and create your artwork.
-- **Bid on Artwork:** Browse available artwork and place bids in real-time.
-- **Notifications:** Check your notifications to see if you've been outbid.
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Run the local development server |
+| `pnpm build` | Create a production build |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | Run the Next.js ESLint checks |
 
-## 💡 Future Improvements
+## Contributing
 
-- Add user settings and profile customization.
-- Add OAuth.
-- Implement social sharing features for artwork.
-- Enhance the notification system with email alerts.
+Issues and pull requests are welcome. For a code change:
 
-## 📄 License
+1. Fork the repository and create a focused branch.
+2. Run `pnpm lint` and `pnpm build`.
+3. Explain the user-facing impact in the pull request.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+If you are planning a larger change, open an issue first so the approach can be
+discussed.
 
-## 🙏 Acknowledgements
+## Roadmap
 
-- Thanks to the amazing Firebase community for the awesome tools and support.
-- Inspired by [dribble design](https://dribbble.com/shots/19414536-Auktion-NFT-Auction-Site).
+- OAuth sign-in options
+- User settings and profile customization
+- Shareable artwork pages
+- Email notification support
 
+## Acknowledgements
+
+The visual direction was inspired by this
+[NFT auction concept on Dribbble](https://dribbble.com/shots/19414536-Auktion-NFT-Auction-Site).
+
+## License
+
+Distributed under the [MIT License](LICENSE).
